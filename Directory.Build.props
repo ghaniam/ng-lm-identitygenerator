@@ -15,7 +15,6 @@
     <PackageProjectUrl>https://github.com/ghaniam/ng-lm-identitygenerator</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ghaniam/ng-lm-identitygenerator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>identity;generator;guid;id;unique</PackageTags>
     <Description>A library module for generating unique identities</Description>
     
