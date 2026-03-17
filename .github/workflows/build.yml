@@ -47,6 +47,7 @@ jobs:
           name: build-artifacts
           path: |
             src/NG.LM.IdentityGenerator.Core/bin/Release/
+            src/NG.LM.IdentityGenerator.Core/obj/
             src/NG.LM.IdentityGenerator.Core.Tests/bin/Release/
           retention-days: 1
 
@@ -69,7 +70,7 @@ jobs:
           name: build-artifacts
 
       - name: Run unit tests
-        run: dotnet test ng-lm-identitygenerator.sln --configuration Release --verbosity normal
+        run: dotnet test ng-lm-identitygenerator.sln --configuration Release --verbosity normal --no-build
 
   parallel-simulated-test:
     needs: build
@@ -111,7 +112,7 @@ jobs:
           name: build-artifacts
 
       - name: Create NuGet package
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration Release --output package -p:PackageVersion=${{ needs.build.outputs.version }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration Release --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v4
