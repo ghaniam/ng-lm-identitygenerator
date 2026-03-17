@@ -22,6 +22,16 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Install Nerdbank.GitVersioning
+        run: dotnet tool install --global nbgv
+
+      - name: Determine version
+        id: nbgv
+        run: |
+          VERSION=$(nbgv get-version -v NuGetPackageVersion)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Package version will be: $VERSION"
+
       - name: Restore dependencies
         run: dotnet restore ng-lm-identitygenerator.sln
 
@@ -31,35 +41,13 @@ jobs:
       - name: Run tests
         run: dotnet test ng-lm-identitygenerator.sln --configuration Release --no-build --verbosity normal
 
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v1.1.1
-        with:
-          versionSpec: '6.x'
-        
-      - name: Determine Version
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v1.1.1
-        
-      - name: Set Package Version
-        id: package_version
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "VERSION=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
-          else
-            SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
-            echo "VERSION=${{ steps.gitversion.outputs.semVer }}-${{ github.run_number }}-${SHORT_SHA}" >> $GITHUB_OUTPUT
-          fi
-      
-      - name: Display Package Version
-        run: echo "Package version will be ${{ steps.package_version.outputs.VERSION }}"
-        
       - name: Create NuGet package
-        run: dotnet pack src/ng-lm-identitygenerator.Core/ng-lm-identitygenerator.Core.csproj --configuration Release --output package --no-build -p:Version=${{ steps.package_version.outputs.VERSION }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration Release --output package --no-build -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v4
         with:
-          name: github-netguidgenerator
+          name: ng-lm-identitygenerator-github
           path: package/*.nupkg
           retention-days: 1
  
