@@ -9,23 +9,5 @@
     "buildNumber": {
       "enabled": true
     }
-  },
-  "inherit": false,
-  "pathFilters": [
-    "./src"
-  ],
-  "branchOptions": {
-    "main": {
-      "versionIncrement": "none"
-    },
-    "fix/*": {
-      "versionIncrement": "patch"
-    },
-    "feature/*": {
-      "versionIncrement": "minor"
-    },
-    "release/*": {
-      "versionIncrement": "major"
-    }
   }
 }
