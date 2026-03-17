@@ -1,0 +1,78 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  continuous-integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ng-lm-identitygenerator.sln
+
+      - name: Build solution
+        run: dotnet build ng-lm-identitygenerator.sln --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test ng-lm-identitygenerator.sln --configuration Release --no-build --verbosity normal
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '5.x'
+        
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.10.2
+        
+      - name: Set Package Version
+        id: package_version
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "VERSION=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
+          else
+            SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+            echo "VERSION=${{ steps.gitversion.outputs.semVer }}-${{ github.run_number }}-${SHORT_SHA}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Display Package Version
+        run: echo "Package version will be ${{ steps.package_version.outputs.VERSION }}"
+        
+      - name: Create NuGet package
+        run: dotnet pack src/ng-lm-identitygenerator.Core/ng-lm-identitygenerator.Core.csproj --configuration Release --output package --no-build -p:Version=${{ steps.package_version.outputs.VERSION }}
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-netguidgenerator
+          path: package/*.nupkg
+          retention-days: 1
+ 
+
+  # continuous-deployment:
+  #   needs: continuous-integration
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: '9.0.x'
