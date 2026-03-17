@@ -8,8 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  continuous-integration:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.nbgv.outputs.VERSION }}
 
     steps:
       - name: Checkout code
@@ -39,11 +41,77 @@ jobs:
       - name: Build solution
         run: dotnet build ng-lm-identitygenerator.sln --configuration Release --no-restore
 
-      - name: Run tests
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            src/NG.LM.IdentityGenerator.Core/bin/Release/
+            src/NG.LM.IdentityGenerator.Core.Tests/bin/Release/
+          retention-days: 1
+
+  unit-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Run unit tests
         run: dotnet test ng-lm-identitygenerator.sln --configuration Release --no-build --verbosity normal
 
+  parallel-simulated-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Run simulated parallel test
+        run: echo "Running simulated parallel tests..." && sleep 5 && echo "Simulated parallel tests completed."
+
+  package:
+    needs: [unit-test, parallel-simulated-test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
       - name: Create NuGet package
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration Release --output package --no-build -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration Release --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v4
