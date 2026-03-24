@@ -55,10 +55,9 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            src/NG.LM.IdentityGenerator.Core/bin/${{ inputs.build_configuration || 'Release' }}/
-            src/NG.LM.IdentityGenerator.Core/obj/
-            src/NG.LM.IdentityGenerator.Core.Tests/bin/${{ inputs.build_configuration || 'Release' }}/
-            src/NG.LM.IdentityGenerator.Core.Tests/obj/
+            src/src/NG.LM.IdentityGenerator.Core/bin/${{ inputs.build_configuration || 'Release' }}/
+            src/src/NG.LM.IdentityGenerator.Core/obj/
+            src/src/NG.LM.IdentityGenerator.Core.Tests/bin/${{ inputs.build_configuration || 'Release' }}/
           retention-days: 1
           #include-hidden-files: true
 
