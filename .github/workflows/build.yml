@@ -55,9 +55,7 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            src/NG.LM.IdentityGenerator.Core/bin/${{ inputs.build_configuration || 'Release' }}/
-            src/NG.LM.IdentityGenerator.Core/obj/
-            src/NG.LM.IdentityGenerator.Core*/*.csproj
+            src/NG.LM.IdentityGenerator.Core*/*
           retention-days: 1
 
   unit-test:
@@ -108,7 +106,7 @@ jobs:
           name: build-artifacts
 
       - name: Create NuGet package
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
+        run: dotnet pack NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v4
