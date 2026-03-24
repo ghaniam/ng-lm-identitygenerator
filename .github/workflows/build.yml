@@ -58,7 +58,9 @@ jobs:
             src/NG.LM.IdentityGenerator.Core/bin/${{ inputs.build_configuration || 'Release' }}/
             src/NG.LM.IdentityGenerator.Core/obj/
             src/NG.LM.IdentityGenerator.Core.Tests/bin/${{ inputs.build_configuration || 'Release' }}/
+            src/NG.LM.IdentityGenerator.Core.Tests/obj/
           retention-days: 1
+          #include-hidden-files: true
 
   unit-test:
     needs: build
