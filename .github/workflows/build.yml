@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
+    inputs:
+      build_configuration:
+        description: 'Build configuration'
+        required: false
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
 
 jobs:
   build:
@@ -39,16 +48,16 @@ jobs:
         run: dotnet restore ng-lm-identitygenerator.sln
 
       - name: Build solution
-        run: dotnet build ng-lm-identitygenerator.sln --configuration Release --no-restore
+        run: dotnet build ng-lm-identitygenerator.sln --configuration ${{ inputs.build_configuration || 'Release' }} --no-restore
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: |
-            src/NG.LM.IdentityGenerator.Core/bin/Release/
+            src/NG.LM.IdentityGenerator.Core/bin/${{ inputs.build_configuration || 'Release' }}/
             src/NG.LM.IdentityGenerator.Core/obj/
-            src/NG.LM.IdentityGenerator.Core.Tests/bin/Release/
+            src/NG.LM.IdentityGenerator.Core.Tests/bin/${{ inputs.build_configuration || 'Release' }}/
           retention-days: 1
 
   unit-test:
@@ -70,7 +79,7 @@ jobs:
           name: build-artifacts
 
       - name: Run unit tests
-        run: dotnet test ng-lm-identitygenerator.sln --configuration Release --verbosity normal --no-build
+        run: dotnet test ng-lm-identitygenerator.sln --configuration ${{ inputs.build_configuration || 'Release' }} --verbosity normal --no-build
 
   parallel-simulated-test:
     needs: build
@@ -112,7 +121,7 @@ jobs:
           name: build-artifacts
 
       - name: Create NuGet package
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration Release --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v4
@@ -120,17 +129,26 @@ jobs:
           name: ng-lm-identitygenerator-github
           path: package/*.nupkg
           retention-days: 1
- 
+    
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
 
-  # continuous-deployment:
-  #   needs: continuous-integration
-  #   runs-on: ubuntu-latest
+    steps:
+      - name: Simulate
+        uses: actions/checkout@v4
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
 
-  #     - name: Setup .NET
-  #       uses: actions/setup-dotnet@v4
-  #       with:
-  #         dotnet-version: '9.0.x'
+      - name: Download NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          name: ng-lm-identitygenerator-github
+
+      - name: Publish NuGet package
+        run: echo "Simulating NuGet package publish..." && sleep 5 && echo "Simulated NuGet package publish completed."
+        #run: dotnet nuget push package/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
