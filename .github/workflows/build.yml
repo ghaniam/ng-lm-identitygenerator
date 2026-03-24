@@ -54,11 +54,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
+          include-hidden-files: true
           path: |
             src/NG.LM.IdentityGenerator.Core/bin/${{ inputs.build_configuration || 'Release' }}/
             src/NG.LM.IdentityGenerator.Core/obj/
           retention-days: 1
-          #include-hidden-files: true
 
   unit-test:
     needs: build
