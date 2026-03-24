@@ -54,10 +54,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          include-hidden-files: true
           path: |
             src/NG.LM.IdentityGenerator.Core/bin/${{ inputs.build_configuration || 'Release' }}/
             src/NG.LM.IdentityGenerator.Core/obj/
+            src/NG.LM.IdentityGenerator.Core*/*.csproj
           retention-days: 1
 
   unit-test:
@@ -73,15 +73,19 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
       - name: Run unit tests
-        run: dotnet test ng-lm-identitygenerator.sln --configuration ${{ inputs.build_configuration || 'Release' }} --verbosity normal --no-build
+        run: dotnet test src/**/*.Tests.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --verbosity normal --no-build
 
   parallel-simulated-test:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Run simulated parallel test
         run: echo "Running simulated parallel tests..." && sleep 5 && echo "Simulated parallel tests completed."
 
@@ -102,7 +106,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: .
 
       - name: Create NuGet package
         run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
