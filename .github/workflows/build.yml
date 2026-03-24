@@ -91,7 +91,7 @@ jobs:
         run: dotnet restore ng-lm-identitygenerator.sln
 
       - name: Create NuGet package
-        run: dotnet pack NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --output package --no-build -p:PackageVersion=${{ needs.build.outputs.version }}
 
       - name: Publish NuGet package
         run: dotnet nuget push package/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
