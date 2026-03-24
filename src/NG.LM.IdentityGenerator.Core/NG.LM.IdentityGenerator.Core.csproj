@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<PackageId>WormDev.NG.LM.IdentityGenerator.Core</PackageId>
-		<Version>1.0.0</Version>
-		<Authors>WormDev</Authors>
+		<PackageId>WormDev-github.NG.LM.IdentityGenerator.Core</PackageId>
+		<Authors>WormDev-github</Authors>
 		<Description>Generate identifier function</Description>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
