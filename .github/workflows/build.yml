@@ -98,13 +98,5 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Simulate
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-
       - name: Publish NuGet package
         run: echo "Simulating NuGet package publish to PRE-RELEASE..." && sleep 5 && echo "Simulated NuGet package publish completed."
