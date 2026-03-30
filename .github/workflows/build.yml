@@ -95,7 +95,7 @@ jobs:
 
       - name: Publish to Azure Artifacts
         run: |
-          dotnet nuget add source https://pkgs.dev.azure.com/wormdev/ng-lm-identitygenerator/_packaging/wormdev/nuget/v3/index.json \
+          dotnet nuget add source https://pkgs.dev.azure.com/wormdev/_packaging/wormdev/nuget/v3/index.json \
             --name AzureArtifacts \
             --username Github \
             --password ${{ secrets.AZURE_ARTIFACTS_PAT }} \
