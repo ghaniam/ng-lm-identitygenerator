@@ -92,6 +92,15 @@ jobs:
 
       - name: Publish NuGet package
         run: dotnet nuget push package/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+      - name: Publish to Azure Artifacts
+        run: |
+          dotnet nuget add source https://pkgs.dev.azure.com/wormdev/ng-lm-identitygenerator/_packaging/wormdev/nuget/v3/index.json \
+            --name AzureArtifacts \
+            --username Github \
+            --password ${{ secrets.AZURE_ARTIFACTS_PAT }} \
+            --store-password-in-clear-text
+          dotnet nuget push package/*.nupkg --source AzureArtifacts --api-key az --skip-duplicate
     
   publish-to-pre_release:
     needs: package
