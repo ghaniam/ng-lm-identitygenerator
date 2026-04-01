@@ -9,11 +9,9 @@
     <AnalysisMode>Default</AnalysisMode>
     
     <!-- Package Metadata -->
-    <Company>NG</Company>
+    <Company>WormDev</Company>
     <Product>NG.LM.IdentityGenerator</Product>
     <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
-    <PackageProjectUrl>https://github.com/ghaniam/ng-lm-identitygenerator</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ghaniam/ng-lm-identitygenerator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>identity;generator;guid;id;unique</PackageTags>
     <Description>A library module for generating unique identities</Description>
@@ -25,7 +23,6 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <!-- Deterministic Builds -->
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <Deterministic>true</Deterministic>
 
   </PropertyGroup>
