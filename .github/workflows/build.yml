@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Run simulated parallel test
-        run: echo "Running simulated parallel tests..." && sleep 5 && echo "Simulated parallel tests completed."
+        run: echo "Running simulated parallel tests"
 
   package:
     needs: [unit-test, parallel-simulated-test]
