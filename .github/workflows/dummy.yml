@@ -6,4 +6,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: dummy step
-        run: echo "Running dummy job..." && sleep 5 && echo "Dummy job completed."
+        run: echo "Running dummy job...." && sleep 5 && echo "Dummy job completed."
