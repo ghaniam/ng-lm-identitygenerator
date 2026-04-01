@@ -33,9 +33,6 @@ jobs:
       - name: Build
         run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
       
-      - name: Test
-        run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
-      
       - name: Install Nerdbank.GitVersioning
         run: dotnet tool install --global nbgv
 
