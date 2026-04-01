@@ -91,11 +91,3 @@ jobs:
           name: nuget-packages
           path: ./package/*.nupkg
           retention-days: 30
-    
-  publish-to-pre_release:
-    needs: package
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Publish NuGet package
-        run: echo "Simulating NuGet package publish to PRE-RELEASE..." && sleep 5 && echo "Simulated NuGet package publish completed."
