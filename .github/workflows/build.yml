@@ -6,15 +6,10 @@ on:
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
-    inputs:
-      build_configuration:
-        description: 'Build configuration'
-        required: false
-        default: 'Release'
-        type: choice
-        options:
-          - Release
-          - Debug
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  CONFIGURATION: 'Release'
 
 jobs:
   build:
@@ -32,7 +27,7 @@ jobs:
         run: dotnet restore ng-lm-identitygenerator.sln
 
       - name: Build solution
-        run: dotnet build ng-lm-identitygenerator.sln --configuration ${{ inputs.build_configuration || 'Release' }} --no-restore
+        run: dotnet build ng-lm-identitygenerator.sln --configuration ${{ env.CONFIGURATION }} --no-restore
 
   unit-test:
     needs: build
@@ -48,7 +43,7 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Run unit tests
-        run: dotnet test src/**/*.Tests.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --verbosity normal --no-build
+        run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal --no-build
 
   parallel-simulated-test:
     needs: build
@@ -88,19 +83,14 @@ jobs:
           echo "Package version will be: $VERSION"
 
       - name: Create NuGet package
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration || 'Release' }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ env.CONFIGURATION }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
 
-      - name: Publish NuGet package
-        run: dotnet nuget push package/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-
-      - name: Publish to Azure Artifacts
-        run: |
-          dotnet nuget add source https://pkgs.dev.azure.com/wormdev/_packaging/wormdev/nuget/v3/index.json \
-            --name AzureArtifacts \
-            --username Github \
-            --password ${{ secrets.AZURE_ARTIFACTS_PAT }} \
-            --store-password-in-clear-text
-          dotnet nuget push package/*.nupkg --source AzureArtifacts --api-key az --skip-duplicate
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./package/*.nupkg
+          retention-days: 30
     
   publish-to-pre_release:
     needs: package
