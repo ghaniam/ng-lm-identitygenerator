@@ -1,7 +1,9 @@
-name: Publish to Azure Artifacts
+name: Publish Package to GitHub Packages
 
 on:
   workflow_dispatch:
+  release:
+    types: [ published ]
 
 env:
   DOTNET_VERSION: '9.0.x'
@@ -10,6 +12,9 @@ env:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     
     steps:
       - name: Checkout code
@@ -39,13 +44,10 @@ jobs:
           echo "Package version will be: $VERSION"
 
       - name: Pack
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ env.CONFIGURATION }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
 
-      - name: Publish to Azure Artifacts
+      - name: Publish to GitHub Packages
+        if: github.event_name == 'push' || github.event_name == 'release'
         run: |
-          dotnet nuget add source ${{ secrets.AZURE_ARTIFACTS_URL }} \
-            --name AzureArtifacts \
-            --username Github \
-            --password ${{ secrets.AZURE_ARTIFACTS_PAT }} \
-            --store-password-in-clear-text
-          dotnet nuget push package/*.nupkg --source AzureArtifacts --api-key az --skip-duplicate
+          dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
