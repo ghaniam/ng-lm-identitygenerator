@@ -39,7 +39,7 @@ jobs:
           echo "Package version will be: $VERSION"
 
       - name: Pack
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ env.CONFIGURATION }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
 
       - name: Publish to Azure Artifacts
         run: |

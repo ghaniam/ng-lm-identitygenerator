@@ -39,7 +39,7 @@ jobs:
           echo "Package version will be: $VERSION"
 
       - name: Pack
-        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
+        run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ env.CONFIGURATION }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
 
       - name: Publish NuGet package
         run: dotnet nuget push package/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

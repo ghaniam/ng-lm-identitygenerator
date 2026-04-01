@@ -47,7 +47,6 @@ jobs:
         run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ env.CONFIGURATION }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
 
       - name: Publish to GitHub Packages
-        if: github.event_name == 'push' || github.event_name == 'release'
         run: |
           dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
           dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
