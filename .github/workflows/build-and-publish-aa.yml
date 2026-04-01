@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: Publish to Azure Artifacts
 
 on:
   workflow_dispatch:
@@ -41,5 +41,11 @@ jobs:
       - name: Pack
         run: dotnet pack src/NG.LM.IdentityGenerator.Core/NG.LM.IdentityGenerator.Core.csproj --configuration ${{ inputs.build_configuration }} --output package -p:PackageVersion=${{ steps.nbgv.outputs.VERSION }}
 
-      - name: Publish NuGet package
-        run: dotnet nuget push package/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      - name: Publish to Azure Artifacts
+        run: |
+          dotnet nuget add source ${{ secrets.AZURE_ARTIFACTS_URL }} \
+            --name AzureArtifacts \
+            --username Github \
+            --password ${{ secrets.AZURE_ARTIFACTS_PAT }} \
+            --store-password-in-clear-text
+          dotnet nuget push package/*.nupkg --source AzureArtifacts --api-key az --skip-duplicate
