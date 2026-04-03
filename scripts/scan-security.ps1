@@ -1,5 +1,12 @@
 # Security scan script using Trivy
-# Usage: .\scan-security.ps1
+# Usage: .\scan-security.ps1 [-FailOnVulnerabilities]
+#
+# Parameters:
+#   -FailOnVulnerabilities: Exit with error code if vulnerabilities found (default: false)
+
+param(
+    [switch]$FailOnVulnerabilities = $false
+)
 
 Write-Host "🔍 Running Trivy security scan..." -ForegroundColor Cyan
 Write-Host "==================================" -ForegroundColor Cyan
@@ -23,17 +30,33 @@ if (-not $trivyInstalled) {
 
 # Run Trivy scan
 Write-Host "Scanning project directory for vulnerabilities..." -ForegroundColor Green
+if ($FailOnVulnerabilities) {
+    Write-Host "⚠️  Fail-on-vulnerabilities mode: ENABLED" -ForegroundColor Yellow
+}
 Write-Host ""
+
+$exitCode = if ($FailOnVulnerabilities) { "1" } else { "0" }
 
 trivy fs . `
   --severity CRITICAL,HIGH,MEDIUM `
   --format table `
-  --scanners vuln
+  --scanners vuln `
+  --exit-code $exitCode
+
+$scanExitCode = $LASTEXITCODE
 
 Write-Host ""
-Write-Host "✅ Scan complete!" -ForegroundColor Green
+if ($scanExitCode -eq 0) {
+    Write-Host "✅ Scan complete! No vulnerabilities found." -ForegroundColor Green
+} elseif ($FailOnVulnerabilities) {
+    Write-Host "❌ Scan complete! Vulnerabilities detected - build failed." -ForegroundColor Red
+    exit $scanExitCode
+} else {
+    Write-Host "⚠️  Scan complete! Vulnerabilities detected (not failing)." -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "Additional commands:" -ForegroundColor Cyan
+Write-Host "  Fail on vulnerabilities:  .\scan-security.ps1 -FailOnVulnerabilities" -ForegroundColor Yellow
 Write-Host "  View only CRITICAL/HIGH:  trivy fs . --severity CRITICAL,HIGH" -ForegroundColor Yellow
 Write-Host "  Export to JSON:           trivy fs . --severity CRITICAL,HIGH,MEDIUM --format json --output trivy-results.json" -ForegroundColor Yellow
 Write-Host "  Check .NET packages only: dotnet list package --vulnerable --include-transitive" -ForegroundColor Yellow

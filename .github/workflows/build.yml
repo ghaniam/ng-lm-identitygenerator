@@ -1,4 +1,4 @@
-name: Continuous Integration Pipeline
+name: Build and Scan dependencies
 
 on:
   push:
@@ -71,6 +71,17 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore ng-lm-identitygenerator.sln
+          
+      - name: Check for vulnerable NuGet packages
+        run: |
+          echo "Checking for vulnerable NuGet packages..."
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vuln-output.txt
+          if grep -q "has the following vulnerable packages" vuln-output.txt; then
+            echo "❌ Vulnerable packages detected!"
+            exit 1
+          else
+            echo "✅ No vulnerable packages found"
+          fi
 
       - name: Install Nerdbank.GitVersioning
         run: dotnet tool install --global nbgv
