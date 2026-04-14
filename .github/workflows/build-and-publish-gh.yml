@@ -63,8 +63,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ steps.nbgv.outputs.VERSION }}"
-          gh release create "v$VERSION" \
-            --title "Release v$VERSION" \
+          git tag "v$VERSION-pre-release"
+          git push origin "v$VERSION-pre-release"
+          gh release create "v$VERSION-pre-release" \
+            --title "v$VERSION (Pre-release)" \
             --notes "Pre-release version $VERSION" \
             --prerelease \
             ./package/*.nupkg
@@ -90,17 +92,18 @@ jobs:
           name: pre-release-package
           path: package
 
-      - name: Publish to GitHub Packages (Release)
-        run: |
-          dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
-      
-      - name: Promote to Full Release
+      - name: Update GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ needs.pre-release.outputs.version }}"
-          gh release edit "v$VERSION" --prerelease=false --latest
+          git tag "v$VERSION-release"
+          git push origin "v$VERSION-release"
+          gh release edit "v$VERSION-pre-release" \
+            --tag "v$VERSION-release" \
+            --title "v$VERSION (Release)" \
+            --prerelease=false \
+            --notes "Release version $VERSION"
 
   # Stage 3: Publish (Manual Approval Required, Public)
   publish:
@@ -123,7 +126,16 @@ jobs:
           name: pre-release-package
           path: package
 
-      - name: Publish to GitHub Packages (Public)
+      - name: Promote to Final Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+          VERSION="${{ needs.pre-release.outputs.version }}"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          gh release edit "v$VERSION-release" \
+            --tag "v$VERSION" \
+            --title "v$VERSION" \
+            --notes "Publish version $VERSION" \
+            --prerelease=false \
+            --latest
