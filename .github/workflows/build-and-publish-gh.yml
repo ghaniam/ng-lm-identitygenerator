@@ -20,7 +20,7 @@ jobs:
       name: pre-release
       url: https://github.com/${{ github.repository }}/packages
     permissions:
-      contents: read
+      contents: write
       packages: write
     
     steps:
@@ -62,7 +62,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="${{ needs.pre-release.outputs.version }}"
+          VERSION="${{ steps.nbgv.outputs.VERSION }}"
           gh release create "v$VERSION" \
             --title "Release v$VERSION" \
             --notes "Pre-release version $VERSION" \
