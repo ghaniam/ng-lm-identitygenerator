@@ -97,6 +97,7 @@ jobs:
             --tag "v$VERSION-release" \
             --title "v$VERSION (Release)" \
             --prerelease=false \
+            --latest=false \
             --notes "Release version $VERSION"
 
   # Stage 3: Publish (Manual Approval Required, Public)
