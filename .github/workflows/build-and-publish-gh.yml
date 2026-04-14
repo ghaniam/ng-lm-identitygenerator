@@ -14,6 +14,8 @@ jobs:
   # Stage 1: Pre-release (Automatic, Private)
   pre-release:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.nbgv.outputs.VERSION }}
     environment:
       name: pre-release
       url: https://github.com/${{ github.repository }}/packages
@@ -71,7 +73,7 @@ jobs:
       name: release
       url: https://github.com/${{ github.repository }}/packages
     permissions:
-      contents: read
+      contents: write
       packages: write
     
     steps:
@@ -86,18 +88,26 @@ jobs:
           dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
           dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
       
-      - name: Release notification
-        run: echo "Package promoted to Release stage (private)"
+      - name: Create GitHub Pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.pre-release.outputs.version }}"
+          gh release create "v$VERSION" \
+            --title "Release v$VERSION" \
+            --notes "Pre-release version $VERSION" \
+            --prerelease \
+            ./package/*.nupkg
 
   # Stage 3: Publish (Manual Approval Required, Public)
   publish:
-    needs: release
+    needs: [pre-release, release]
     runs-on: ubuntu-latest
     environment:
-      name: production
+      name: publish
       url: https://github.com/${{ github.repository }}/packages
     permissions:
-      contents: read
+      contents: write
       packages: write
     
     steps:
@@ -112,5 +122,9 @@ jobs:
           dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
           dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
       
-      - name: Publish notification
-        run: echo "Package published to GitHub Packages (public)"
+      - name: Promote to Full Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.pre-release.outputs.version }}"
+          gh release edit "v$VERSION" --prerelease=false --latest
