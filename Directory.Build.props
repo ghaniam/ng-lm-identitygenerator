@@ -14,7 +14,7 @@
     <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageTags>identity;generator;guid;id;unique</PackageTags>
-    <Description>A library module for generating unique identities</Description>
+    <Description>A library module for generating unique identities (GUIDs)</Description>
     
     <!-- Source Control -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
