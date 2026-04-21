@@ -8,7 +8,7 @@
             var prefix = "TEST";
             var identifier = IdGenerator.GenerateId(prefix);
             Assert.NotNull(identifier);
-            Assert.Equal(prefix, identifier.Substring(0, 4));
+            Assert.Equal(prefix, identifier[..prefix.Length]);
         }
     }
 }
