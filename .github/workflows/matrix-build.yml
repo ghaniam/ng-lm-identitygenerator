@@ -1,0 +1,48 @@
+name: Continuous Integration Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  CONFIGURATION: 'Release'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, windows-2025-vs2026, windows-2022]
+        dotnet-version: ['8.0.x', '9.0.x']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ng-lm-identitygenerator.sln
+
+      - name: Build solution
+        run: dotnet build ng-lm-identitygenerator.sln --configuration ${{ env.CONFIGURATION }} --no-restore
+
+  windows-test:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Info on Windows environment
+        run: |
+          Write-Host "Running on Windows"
+          Write-Host "OS: $env:OS"
+          Write-Host "Computer Name: $env:COMPUTERNAME"
+          systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+          
+          Write-Host "Older Windows OS should use Self-hosted runner."
