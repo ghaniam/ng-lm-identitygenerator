@@ -13,7 +13,11 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, windows-2025-vs2026, windows-2022, windows-11-arm64]
+        dotnet-version: ['8.0.x', '9.0.x']
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,7 +25,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
         run: dotnet restore ng-lm-identitygenerator.sln
@@ -40,7 +44,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run unit tests
         run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal --no-build
@@ -53,8 +57,20 @@ jobs:
       - name: Run simulated parallel test
         run: echo "Running simulated parallel tests"
 
+  windows-test:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Display Windows environment
+        run: |
+          Write-Host "Running on Windows"
+          Write-Host "OS: $env:OS"
+          Write-Host "Computer Name: $env:COMPUTERNAME"
+          systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+
   package:
-    needs: [unit-test, parallel-simulated-test]
+    needs: [unit-test, parallel-simulated-test, windows-test]
     runs-on: ubuntu-latest
 
     steps:
@@ -67,7 +83,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
         run: dotnet restore ng-lm-identitygenerator.sln
