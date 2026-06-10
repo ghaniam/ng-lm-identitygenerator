@@ -1,10 +1,6 @@
-name: Continuous Integration Pipeline
+name: Matrix Build
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -44,5 +40,4 @@ jobs:
           Write-Host "OS: $env:OS"
           Write-Host "Computer Name: $env:COMPUTERNAME"
           systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
-          
           Write-Host "Older Windows OS should use Self-hosted runner."
