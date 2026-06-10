@@ -1,4 +1,4 @@
-name: Continuous Integration Pipeline
+name: Matrix Build
 
 on:
   push:
