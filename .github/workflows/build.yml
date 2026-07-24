@@ -43,7 +43,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run unit tests
-        run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal --no-build
+        run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
 
   parallel-simulated-test:
     needs: build
