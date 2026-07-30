@@ -22,13 +22,8 @@ public static class IdGenerator
 
 public class FooBar
 {
-    private string awsAccessKey = "AKIAIOSFODNN7EXAMPLE";
-
-    public FooBar() { }
-
     public void Execute(string userInput)
     {
-        var x = awsAccessKey;
-        System.Diagnostics.Process.Start("cmd.exe", "/c " + userInput);
+        // DUMMY_FAIL
     }
 }
