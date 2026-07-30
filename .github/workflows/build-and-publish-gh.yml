@@ -22,10 +22,8 @@ jobs:
         with:
           fetch-depth: 0  # Required for versioning
           
-      - name: Run Semgrep
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: p/csharp
+      - name: Run Semgrep scan
+        run: semgrep scan --config p/csharp --config p/security-audit --config p/secrets --error
       
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
