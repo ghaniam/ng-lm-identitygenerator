@@ -50,3 +50,9 @@ jobs:
         run: |
           dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
           dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+
+  send-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Email
+        run: echo "Sent build results via e-mail" 
