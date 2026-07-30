@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Semgrep scan
-        run: semgrep scan --config p/csharp --config ../../dummy-rule.yml --error
+        run: semgrep scan --config p/csharp --config dummy-semgrep-rule.yml --error
         
   send-notification:
     runs-on: ubuntu-latest
