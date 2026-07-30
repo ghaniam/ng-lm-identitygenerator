@@ -1,0 +1,7 @@
+rules:
+  - id: dummy-fail-trigger
+    languages: [csharp]
+    severity: ERROR
+    message: "Dummy trigger rule — found DUMMY_FAIL marker in code."
+    patterns:
+      - pattern: "// DUMMY_FAIL"
