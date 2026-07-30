@@ -19,3 +19,13 @@ public static class IdGenerator
         return Enumerable.Range(start, count).OrderBy(x => new Random().Next()).First();
     }
 }
+
+public class FooBar
+{
+    private string password = "SuperSecret123!";
+    public FooBar(){}
+    public void Execute()
+    {
+        var x = password;
+    }
+}
