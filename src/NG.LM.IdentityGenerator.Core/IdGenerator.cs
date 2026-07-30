@@ -22,10 +22,13 @@ public static class IdGenerator
 
 public class FooBar
 {
-    private string password = "SuperSecret123!";
-    public FooBar(){}
-    public void Execute()
+    private string awsAccessKey = "AKIAIOSFODNN7EXAMPLE";
+
+    public FooBar() { }
+
+    public void Execute(string userInput)
     {
-        var x = password;
+        var x = awsAccessKey;
+        Process.Start("cmd.exe", "/c " + userInput);
     }
 }
