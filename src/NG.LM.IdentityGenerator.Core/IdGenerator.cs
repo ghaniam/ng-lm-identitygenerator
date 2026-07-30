@@ -29,6 +29,6 @@ public class FooBar
     public void Execute(string userInput)
     {
         var x = awsAccessKey;
-        Process.Start("cmd.exe", "/c " + userInput);
+        System.Diagnostics.Process.Start("cmd.exe", "/c " + userInput);
     }
 }
