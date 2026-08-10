@@ -51,14 +51,58 @@ jobs:
           dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
           dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
 
-  semgrep:
+  trivy-scan:
     runs-on: ubuntu-latest
-    container:
-      image: semgrep/semgrep
+    permissions:
+      contents: read
+      security-events: write
+    env:
+      TRIVY_CACHE_DIR: .trivycache
     steps:
-      - uses: actions/checkout@v4
-      - name: Run Semgrep scan
-        run: semgrep scan --config p/csharp --config dummy-semgrep-rule.yml --error
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: .trivycache
+          key: trivy-db
+
+      # Fail the job if any HIGH or CRITICAL vulnerability, secret, or misconfig is found.
+      - name: Run Trivy scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          format: table
+
+      # Also emit a SARIF report for the GitHub Security tab, without failing the job twice.
+      - name: Generate SARIF report
+        if: always()
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: 0
+          format: sarif
+          output: trivy-report.sarif
+
+      - name: Upload SARIF to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-report.sarif
+
+      - name: Upload Trivy report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.sarif
+          retention-days: 7
         
   send-notification:
     runs-on: ubuntu-latest

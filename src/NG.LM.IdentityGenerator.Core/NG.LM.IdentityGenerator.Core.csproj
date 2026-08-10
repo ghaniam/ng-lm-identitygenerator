@@ -16,6 +16,8 @@
 	<ItemGroup>
 	  <PackageReference Include="Serilog" Version="4.3.1" />
 	  <PackageReference Include="System.Text.Json" Version="10.0.5" />
+	  <!-- DUMMY_VULN: intentionally outdated to trigger the Trivy scan for demo purposes -->
+	  <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
 	</ItemGroup>
 
 </Project>
