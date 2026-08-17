@@ -12,7 +12,7 @@ env:
   PACKAGE_ID: 'WormDev-github.NG.LM.IdentityGenerator'
 
 jobs:
-  # Stage 1: Pre-release (Automatic, Private)
+  # Stage 1: Pre-release (Automatic, Private)  
   continuous-integration:
     runs-on: ubuntu-latest
     outputs:
