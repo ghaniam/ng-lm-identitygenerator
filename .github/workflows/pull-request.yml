@@ -30,6 +30,10 @@ jobs:
   unit-test:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -41,14 +45,17 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run unit tests
-        run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --logger trx --results-directory "TestResults"
+        run: >
+          dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory ./TestResults
 
       - name: Publish test results
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Unit Test Results
-          path: 'TestResults/*.trx'
+          path: TestResults/*.trx
           reporter: dotnet-trx
 
   parallel-simulated-test:
