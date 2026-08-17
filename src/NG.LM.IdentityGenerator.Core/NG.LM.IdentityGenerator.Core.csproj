@@ -11,12 +11,6 @@
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 	</PropertyGroup>
   	<ItemGroup>
-  	  <!-- Intentionally vulnerable versions (CRITICAL RCE / high-severity CVEs) to demo
-  	       trivy-scan failing the pipeline. Picked to be pure-managed, cross-platform
-  	       packages (unlike System.Drawing.Common, which is Windows-only at runtime and
-  	       doesn't fit a Linux container job) so they resolve/restore fine on any OS. -->
-  	  <!-- CVE-2021-26701, CRITICAL RCE -->
-  	  <PackageReference Include="System.Text.Encodings.Web" Version="4.5.0" />
   	  <!-- CVE-2024-21907, HIGH DoS (uncontrolled resource consumption) -->
   	  <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   	</ItemGroup>
