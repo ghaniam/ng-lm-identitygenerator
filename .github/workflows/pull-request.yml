@@ -1,0 +1,52 @@
+name: Pull Request Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  CONFIGURATION: 'Release'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ng-lm-identitygenerator.sln
+
+      - name: Build solution
+        run: dotnet build ng-lm-identitygenerator.sln --configuration ${{ env.CONFIGURATION }} --no-restore
+
+  unit-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Run unit tests
+        run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal --no-build
+
+  parallel-simulated-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run simulated parallel test
+        run: echo "Running simulated parallel tests"
