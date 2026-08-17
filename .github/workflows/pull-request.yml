@@ -41,7 +41,15 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Run unit tests
-        run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal --no-build
+        run: dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --no-restore --logger trx --results-directory "TestResults"
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Test Results
+          path: 'TestResults/*.trx'
+          reporter: dotnet-trx
 
   parallel-simulated-test:
     needs: build
