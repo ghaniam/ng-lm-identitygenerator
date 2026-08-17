@@ -10,6 +10,7 @@
     
     <!-- Package Metadata -->
     <Company>WormDev</Company>
+    <Authors>WormDev-github</Authors>
     <Product>NG.LM.IdentityGenerator</Product>
     <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
     <RepositoryType>git</RepositoryType>

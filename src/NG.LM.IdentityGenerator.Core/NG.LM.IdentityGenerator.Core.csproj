@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<PackageId>WormDev-github.NG.LM.IdentityGenerator.Core</PackageId>
-		<Authors>WormDev-github</Authors>
 		<Description>Generate identifier function</Description>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -12,6 +10,10 @@
 	<PropertyGroup>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 	</PropertyGroup>
+  	<ItemGroup>
+  	  <!-- CVE-2024-21907, HIGH DoS (uncontrolled resource consumption) -->
+  	  <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="Serilog" Version="4.3.1" />
