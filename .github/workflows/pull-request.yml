@@ -10,23 +10,6 @@ env:
   CONFIGURATION: 'Release'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore dependencies
-        run: dotnet restore ng-lm-identitygenerator.sln
-
-      - name: Build solution
-        run: dotnet build ng-lm-identitygenerator.sln --configuration ${{ env.CONFIGURATION }} --no-restore
-
   unit-test:
     needs: build
     runs-on: ubuntu-latest
@@ -44,9 +27,12 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Restore dependencies
+        run: dotnet restore ng-lm-identitygenerator.sln
+
       - name: Run unit tests
         run: >
-          dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal --no-build
+          dotnet test src/**/*.Tests.csproj --configuration ${{ env.CONFIGURATION }} --verbosity normal
           --logger "trx;LogFileName=test-results.trx"
           --results-directory ./TestResults
 
@@ -57,11 +43,3 @@ jobs:
           name: Unit Test Results
           path: TestResults/*.trx
           reporter: dotnet-trx
-
-  parallel-simulated-test:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Run simulated parallel test
-        run: echo "Running simulated parallel tests"
