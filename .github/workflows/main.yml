@@ -12,7 +12,7 @@ env:
   PACKAGE_ID: 'WormDev-github.NG.LM.IdentityGenerator'
 
 jobs:
-  # Stage 1: Pre-release (Automatic, Private)  
+  
   continuous-integration:
     runs-on: ubuntu-latest
     outputs:
@@ -58,7 +58,7 @@ jobs:
           dotnet nuget add source --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
           dotnet nuget push ./package/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
   
-  # Stage 2: Pre-release (Automatic, Private)
+  # Stage 1: Pre-release (Automatic, Private)
   pre-release:
     needs: continuous-integration
     runs-on: ubuntu-latest
