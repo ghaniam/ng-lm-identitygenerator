@@ -100,7 +100,7 @@ jobs:
 
   # Stage 2: Release (Manual Approval Required, Private)
   release:
-    needs: pre-release
+    needs: [continuous-integration, pre-release]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -129,7 +129,7 @@ jobs:
 
   # Stage 3: Publish (Manual Approval Required, Public)
   publish:
-    needs: [pre-release, release]
+    needs: [continuous-integration, pre-release, release]
     runs-on: ubuntu-latest
     environment:
       name: publish
