@@ -21,6 +21,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Print PR and work item info
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        run: |
+          WORK_ITEM_ID=$(echo "$BRANCH_NAME" | grep -oE '^[0-9]+' || echo "unknown")
+          echo "Pull Request ID: $PR_NUMBER"
+          echo "Work Item ID: $WORK_ITEM_ID"
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
