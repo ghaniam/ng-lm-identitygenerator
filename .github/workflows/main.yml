@@ -98,7 +98,12 @@ jobs:
             --prerelease \
             ./package/*.nupkg
 
-  # Stage 2: Release (Manual Approval Required, Private)
+  # Example Release Quality Gates Release (Manual Approval Required, Private)
+  # Example Level 2: Inter-Department / Inter-Product Environment (Enterprise Release):
+  # - Integration Testing: Verifies that your package interacts correctly with neighboring modules and local databases.
+  # - Software Composition Analysis (SCA): Scans open-source dependencies used by the package for licensing compliance and known security vulnerabilities.
+  # - API Contract Testing: Confirms that API inputs and outputs have not changed, preventing breaking changes for sister teams.
+  # - Basic Performance Profiling: Checks that the package does not cause memory leaks or severe CPU spikes under light usage.
   release:
     needs: [continuous-integration, pre-release]
     runs-on: ubuntu-latest
@@ -126,6 +131,12 @@ jobs:
             --prerelease=false \
             --latest=false \
             --notes "Release version $VERSION"
+  #test
+  # Example Publish Quality Gates: Inter-Department / Inter-Product Environment (Enterprise Release):
+  # - Dynamic Application Security Testing (DAST): Tests the running, integrated application from the outside to mimic a hacker trying to exploit vulnerabilities.
+  # - Load and Stress Testing: Simulates high user traffic to prove the package can handle production-level data volumes.
+  # - Backward Compatibility Verification: Ensures that other departments using older versions of your APIs or data schemas will not experience system failures.
+  # - Regulated Compliance Audits: Automates checks for legal requirements, data privacy (like GDPR), and organizational governance.
 
   # Stage 3: Publish (Manual Approval Required, Public)
   publish:

@@ -9,6 +9,7 @@ public static class IdGenerator
 
     public static string GenerateSequentialId(string prefix = "SEQ")
     {
+        var x = new Random().Next(100000, 999999);
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var random = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
         return $"{prefix}-{timestamp}-{random}";
